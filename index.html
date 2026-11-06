@@ -2,290 +2,375 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Super Times Tables Hero!</title>
     <style>
+        /* Force clear positioning layout */
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
+
         body {
             font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
-            background: #bae6fd;
+            background-color: #bae6fd; /* Clean light blue */
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0;
             padding: 20px;
             position: relative;
             overflow: hidden;
         }
 
-        /* Clouds Background */
-        .cloud {
-            background: white;
+        /* Smooth Floating Cloud Shapes */
+        .sky-cloud {
+            background: #ffffff;
             border-radius: 100px;
-            box-shadow: 0 8px 5px rgba(0, 0, 0, 0.05);
             position: absolute;
             z-index: 1;
             opacity: 0.85;
+            box-shadow: 0 8px 10px rgba(0, 0, 0, 0.04);
         }
-        .cloud:after, .cloud:before {
-            background: white;
+        .sky-cloud::before, .sky-cloud::after {
             content: '';
+            background: #ffffff;
             position: absolute;
-            z-index: -1;
+            border-radius: 50%;
         }
-        .cloud:after {
-            border-radius: 100px;
-            height: 100px;
-            left: 50px;
-            top: -50px;
+        .sky-cloud::before {
+            width: 140px;
+            height: 140px;
+            top: -70px;
+            left: 40px;
+        }
+        .sky-cloud::after {
             width: 100px;
+            height: 100px;
+            top: -40px;
+            right: 40px;
         }
-        .cloud:before {
-            border-radius: 200px;
-            width: 180px;
-            height: 180px;
-            right: 50px;
-            top: -90px;
-        }
-        .c1 { width: 350px; height: 120px; top: 10%; left: -350px; animation: floatAround 35s infinite linear; }
-        .c2 { width: 200px; height: 70px; top: 45%; right: -200px; animation: floatAround 25s infinite linear reverse; }
-        .c3 { width: 280px; height: 90px; bottom: 15%; left: -280px; animation: floatAround 40s infinite linear; }
+        
+        .cloud-1 { width: 280px; height: 90px; top: 12%; left: -300px; animation: driftRight 38s infinite linear; }
+        .cloud-2 { width: 220px; height: 75px; top: 48%; right: -250px; animation: driftRight 28s infinite linear reverse; }
+        .cloud-3 { width: 310px; height: 100px; bottom: 12%; left: -320px; animation: driftRight 45s infinite linear; }
 
-        @keyframes floatAround {
+        @keyframes driftRight {
             0% { transform: translateX(-100px); }
-            100% { transform: translateX(120vw); }
+            100% { transform: translateX(125vw); }
         }
 
-        /* Main Game Container */
-        .game-container {
+        /* Centred Game Console Housing */
+        .game-wrapper {
             background: rgba(255, 255, 255, 0.98);
-            border-radius: 32px;
-            padding: 30px 24px;
-            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
-            text-align: center;
-            max-width: 450px;
-            width: 100%;
             border: 8px solid #ffde4d;
+            border-radius: 32px;
+            padding: 28px 24px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+            text-align: center;
             position: relative;
             z-index: 10;
         }
-        
-        h1 { 
-            color: #ff3b70; 
-            margin-top: 0; 
-            margin-bottom: 15px;
-            font-size: 2.1rem; 
-            text-shadow: 2px 2px #fff699; 
-            letter-spacing: 1px; 
+
+        h1 {
+            color: #ff3b70;
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+            text-shadow: 2px 2px #fff699;
+            letter-spacing: 0.5px;
         }
-        
-        .stats-grid {
+
+        /* Stat Readouts Grid Layout */
+        .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
-        .stat-box {
+
+        .data-panel {
             background: #f0f7ff;
-            padding: 10px;
+            border: 3px solid #e2e8f0;
             border-radius: 14px;
+            padding: 10px;
             font-size: 1.1rem;
             font-weight: bold;
             color: #1e293b;
-            border: 3px solid #e2e8f0;
         }
-        .streak-box {
+
+        .streak-panel {
             grid-column: span 2;
             background: #fef3c7;
             border-color: #fde68a;
             color: #92400e;
         }
 
-        .timer-bar-container {
+        /* Active Visual Timer Track */
+        .timer-track {
             background: #f1f5f9;
-            height: 18px;
+            height: 20px;
             border-radius: 10px;
+            border: 3px solid #e2e8f0;
             margin-bottom: 20px;
             overflow: hidden;
-            border: 3px solid #e2e8f0;
-        }
-        .timer-bar {
-            background: linear-gradient(90deg, #4ade80, #22c55e);
-            height: 100%;
-            width: 100%;
-            transition: width 1s linear;
         }
 
-        .flashcard {
+        .timer-fill {
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            width: 100%;
+            height: 100%;
+            transition: width 1s linear, background-color 0.3s;
+        }
+
+        /* Math Problem Display Card */
+        .math-flashcard {
             background: #fffdf5;
             border: 5px dashed #ffa043;
             border-radius: 20px;
-            padding: 25px 10px;
-            font-size: 3.5rem;
+            padding: 24px;
+            font-size: 3.6rem;
             font-weight: bold;
             color: #1e293b;
             margin-bottom: 20px;
+            user-select: none;
         }
 
-        .input-area {
+        /* Core Input Processing Area */
+        .submission-bar {
             display: flex;
             gap: 10px;
             justify-content: center;
             margin-bottom: 15px;
         }
-        input {
-            width: 120px;
+
+        .num-input {
+            width: 125px;
             padding: 10px;
-            font-size: 1.8rem;
+            font-size: 2rem;
             text-align: center;
             border: 4px solid #cbd5e1;
             border-radius: 16px;
             outline: none;
-            font-family: inherit;
             color: #1e293b;
+            font-family: inherit;
         }
-        input:focus { border-color: #3b82f6; }
-        
-        button {
+
+        .num-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .action-button {
             background: #3b82f6;
-            color: white;
+            color: #ffffff;
             border: none;
-            padding: 0 25px;
+            padding: 0 24px;
             font-size: 1.3rem;
             font-weight: bold;
             border-radius: 16px;
             cursor: pointer;
             box-shadow: 0 5px 0 #1d4ed8;
-            transition: all 0.1s;
+            transition: transform 0.05s, box-shadow 0.05s;
             font-family: inherit;
         }
-        button:active { transform: translateY(5px); box-shadow: none; }
-        
-        .feedback {
-            font-size: 1.2rem;
+
+        .action-button:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+
+        .action-button:disabled {
+            background: #94a3b8;
+            box-shadow: 0 5px 0 #64748b;
+            cursor: not-allowed;
+        }
+
+        /* State Indicator Alerts */
+        .alert-box {
+            font-size: 1.15rem;
             font-weight: bold;
-            min-height: 50px;
-            margin-top: 10px;
+            min-height: 52px;
             padding: 10px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .correct-pop { color: #166534; background: #dcfce7; border: 3px solid #bbf7d0; animation: bounce 0.5s ease; }
-        .wrong-pop { color: #991b1b; background: #fee2e2; border: 3px solid #fecaca; }
-        
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+            transition: all 0.2s;
         }
 
+        .state-empty { background: transparent; border: none; }
+        .state-correct { color: #166534; background: #dcfce7; border: 3px solid #bbf7d0; animation: starPop 0.4s ease-out; }
+        .state-incorrect { color: #991b1b; background: #fee2e2; border: 3px solid #fecaca; }
+
+        @keyframes starPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+
+        /* Mobile Responsive Viewport Corrections */
         @media (max-width: 480px) {
-            body { padding: 10px; }
+            body { padding: 12px; }
             h1 { font-size: 1.8rem; }
-            .flashcard { font-size: 3rem; padding: 20px 5px; }
-            input { width: 100px; font-size: 1.6rem; }
-            button { font-size: 1.1rem; padding: 0 15px; }
+            .math-flashcard { font-size: 3rem; padding: 18px; }
+            .num-input { width: 105px; font-size: 1.7rem; }
+            .action-button { font-size: 1.15rem; padding: 0 16px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="cloud c1"></div>
-    <div class="cloud c2"></div>
-    <div class="cloud c3"></div>
+    <!-- Soft Cloud Elements -->
+    <div class="sky-cloud cloud-1"></div>
+    <div class="sky-cloud cloud-2"></div>
+    <div class="sky-cloud cloud-3"></div>
 
-    <div class="game-container">
+    <!-- Centred Console Block -->
+    <div class="game-wrapper">
         <h1>Maths Hero! 🚀</h1>
         
-        <div class="stats-grid">
-            <div class="stat-box">⭐ Score: <span id="score">0</span></div>
-            <div class="stat-box">⏳ Time: <span id="time-text">30</span>s</div>
-            <div class="stat-box streak-box">🔥 Current Streak: <span id="streak">0</span> | 🏆 Best: <span id="top-streak">0</span></div>
+        <div class="dashboard-grid">
+            <div class="data-panel">⭐ Score: <span id="display-score">0</span></div>
+            <div class="data-panel">⏳ Time: <span id="display-timer">30</span>s</div>
+            <div class="data-panel streak-panel">🔥 Current Streak: <span id="display-streak">0</span> | 🏆 Best: <span id="display-best">0</span></div>
         </div>
 
-        <div class="timer-bar-container">
-            <div id="timer-bar" class="timer-bar"></div>
+        <div class="timer-track">
+            <div id="visual-timer" class="timer-fill"></div>
         </div>
 
-        <div id="flashcard" class="flashcard">Loading...</div>
+        <div id="display-question" class="math-flashcard">Loading...</div>
 
-        <div class="input-area">
-            <input type="number" id="answer-input" placeholder="?" min="0" autocomplete="off" inputmode="numeric">
-            <button id="check-btn" onclick="checkAnswer()">Check!</button>
+        <div class="submission-bar">
+            <input type="number" id="user-entry" placeholder="?" min="0" autocomplete="off" inputmode="numeric" class="num-input">
+            <button id="submit-trigger" class="action-button">Check!</button>
         </div>
 
-        <div id="feedback" class="feedback"></div>
+        <div id="display-alert" class="alert-box state-empty"></div>
     </div>
 
     <script>
-        // Use a wrapping block to guarantee execution safety
-        window.addEventListener('DOMContentLoaded', () => {
-            let score = 0, num1 = 0, num2 = 0, correctAnswer = 0, attempts = 0, timeLeft = 30, timerInterval;
-            let currentStreak = 0, topStreak = 0;
-            const input = document.getElementById('answer-input');
+        (function() {
+            let activeScore = 0;
+            let runningStreak = 0;
+            let recordStreak = 0;
+            
+            let factorA = 0;
+            let factorB = 0;
+            let targetProduct = 0;
+            let badAttempts = 0;
+            let countdownSeconds = 30;
+            let clockTicker = null;
 
-            function generateQuestion() {
-                num1 = Math.floor(Math.random() * 12) + 1;
-                num2 = Math.floor(Math.random() * 12) + 1;
-                correctAnswer = num1 * num2;
-                attempts = 0;
-                timeLeft = 30;
-                document.getElementById('flashcard').innerText = num1 + " × " + num2;
-                input.value = '';
-                input.disabled = false;
-                document.getElementById('check-btn').disabled = false;
-                document.getElementById('feedback').className = "feedback";
-                document.getElementById('feedback').innerHTML = "";
-                input.focus();
-                startTimer();
+            const inputField = document.getElementById('user-entry');
+            const commitButton = document.getElementById('submit-trigger');
+            const cardDisplay = document.getElementById('display-question');
+            const alertDisplay = document.getElementById('display-alert');
+            const barFill = document.getElementById('visual-timer');
+
+            function startNewRound() {
+                clearInterval(clockTicker);
+
+                factorA = Math.floor(Math.random() * 12) + 1;
+                factorB = Math.floor(Math.random() * 12) + 1;
+                targetProduct = factorA * factorB;
+                
+                badAttempts = 0;
+                countdownSeconds = 30;
+
+                cardDisplay.innerText = factorA + " × " + factorB;
+                document.getElementById('display-timer').innerText = countdownSeconds;
+                
+                alertDisplay.className = "alert-box state-empty";
+                alertDisplay.innerHTML = "";
+                
+                inputField.value = "";
+                inputField.disabled = false;
+                commitButton.disabled = false;
+                
+                updateTimerVisuals();
+                inputField.focus();
+
+                clockTicker = setInterval(runClockStep, 1000);
             }
 
-            function startTimer() {
-                clearInterval(timerInterval);
-                updateTimerBar();
-                timerInterval = setInterval(() => {
-                    timeLeft--;
-                    document.getElementById('time-text').innerText = timeLeft;
-                    updateTimerBar();
-                    if (timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        handleTimeout();
-                    }
-                }, 1000);
-            }
+            function runClockStep() {
+                countdownSeconds--;
+                document.getElementById('display-timer').innerText = countdownSeconds;
+                updateTimerVisuals();
 
-            function updateTimerBar() {
-                const percentage = (timeLeft / 30) * 100;
-                const bar = document.getElementById('timer-bar');
-                if (bar) {
-                    bar.style.width = percentage + '%';
-                    bar.style.background = percentage > 50 ? '#4ade80' : percentage > 20 ? '#facc15' : '#f87171';
+                if (countdownSeconds <= 0) {
+                    clearInterval(clockTicker);
+                    handleTimeOutFailure();
                 }
             }
 
-            window.checkAnswer = function() {
-                let userAnswer = parseInt(input.value);
-                let feedback = document.getElementById('feedback');
-                if (isNaN(userAnswer)) return;
-
-                if (userAnswer === correctAnswer) {
-                    clearInterval(timerInterval);
-                    let points = timeLeft > 15 ? 20 : 10;
-                    score += points;
-                    currentStreak++;
-                    
-                    if (currentStreak > topStreak) {
-                        topStreak = currentStreak;
-                    }
-                    
-                    document.getElementById('score').innerText = score;
-                    document.getElementById('streak').innerText = currentStreak;
-                    document.getElementById('top-streak').innerText = topStreak;
-                    
-                    feedback.className = "feedback correct-pop";
-                    feedback.innerHTML = "🎉 Correct! +" + points + " Points! 🌟";
-                    input.disabled = true;
+            function updateTimerVisuals() {
+                const ratio = (countdownSeconds / 30) * 100;
+                barFill.style.width = ratio + "%";
+                if (ratio > 50) {
+barFill.style.background = "linear-gradient(90deg, #4ade80, #22c55e)";
+} else if (ratio > 20) {
+barFill.style.background = "linear-gradient(90deg, #facc15, #eab308)";
+} else {
+barFill.style.background = "linear-gradient(90deg, #f87171, #ef4444)";
+}
+}
+function processUserValidation() {
+const parsedValue = parseInt(inputField.value, 10);
+if (isNaN(parsedValue)) return;
+inputField.disabled = true;
+commitButton.disabled = true;
+if (parsedValue === targetProduct) {
+clearInterval(clockTicker);
+let gainedPoints = 10;
+if (countdownSeconds >= 20) {
+gainedPoints = 25;
+} else if (countdownSeconds >= 10) {
+gainedPoints = 18;
+}
+activeScore += gainedPoints;
+runningStreak++;
+if (runningStreak > recordStreak) recordStreak = runningStreak;
+document.getElementById('display-score').innerText = activeScore;
+document.getElementById('display-streak').innerText = runningStreak;
+document.getElementById('display-best').innerText = recordStreak;
+alertDisplay.className = "alert-box state-correct";
+alertDisplay.innerHTML = "🎉 Excellent! +" + gainedPoints + " Points! ✨";
+setTimeout(startNewRound, 2000);
+} else {
+badAttempts++;
+if (badAttempts < 3) {
+alertDisplay.className = "alert-box state-incorrect";
+alertDisplay.innerHTML = "❌ Not quite! Try again (Try " + badAttempts + "/3) 🤔";
+inputField.disabled = false;
+commitButton.disabled = false;
+inputField.value = "";
+inputField.focus();
+} else {
+clearInterval(clockTicker);
+runningStreak = 0;
+document.getElementById('display-streak').innerText = runningStreak;
+alertDisplay.className = "alert-box state-incorrect";
+alertDisplay.innerHTML = "💡 Let's learn: " + factorA + " × " + factorB + " = " + targetProduct;
+setTimeout(startNewRound, 3500);
+}
+}
+}
+function handleTimeOutFailure() {
+inputField.disabled = true;
+commitButton.disabled = true;
+runningStreak = 0;
+document.getElementById('display-streak').innerText = runningStreak;
+alertDisplay.className = "alert-box state-incorrect";
+alertDisplay.innerHTML = "⏰ Time's up! " + factorA + " × " + factorB + " = " + targetProduct;
+setTimeout(startNewRound, 3500);
+}
+commitButton.addEventListener('click', processUserValidation);
+inputField.addEventListener('keyup', function(e) {
+if (e.key === "Enter") processUserValidation();
+});
+startNewRound();
+})();
