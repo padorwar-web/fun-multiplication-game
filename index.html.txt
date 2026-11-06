@@ -1,0 +1,227 @@
+# I am setting up a script to download the raw code for you.
+# Running this will create an easy-to-use 'index.html' file on your computer.
+import os
+
+game_code = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Times Tables Hero!</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .game-container {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border: 6px solid #FFED4A;
+        }
+        h1 { color: #FF4A85; margin-top: 0; font-size: 2.2rem; text-shadow: 2px 2px #FFF275; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: #F0F4FF;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            border: 2px solid #CBD5E1;
+        }
+        .timer-bar-container {
+            background: #E2E8F0;
+            height: 16px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 2px solid #CBD5E1;
+        }
+        .timer-bar {
+            background: linear-gradient(90deg, #4ADE80, #22C55E);
+            height: 100%;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .flashcard {
+            background: #FFFAEC;
+            border: 4px dashed #FF9F43;
+            border-radius: 16px;
+            padding: 30px;
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #2C3E50;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 120px;
+            padding: 12px;
+            font-size: 1.8rem;
+            text-align: center;
+            border: 3px solid #CBD5E1;
+            border-radius: 12px;
+            outline: none;
+            font-family: inherit;
+        }
+        input:focus { border-color: #3B82F6; }
+        button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2563EB;
+            transition: transform 0.1s;
+            font-family: inherit;
+        }
+        button:active { transform: translateY(4px); box-shadow: none; }
+        .feedback {
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-height: 40px;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .correct-pop { color: #155724; background: #D4EDDA; border: 2px solid #C3E6CB; animation: bounce 0.5s ease; }
+        .wrong-pop { color: #721C24; background: #F8D7DA; border: 2px solid #F5C6CB; }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Maths Hero! 🚀</h1>
+        <div class="stats-grid">
+            <div class="stat-box">⭐ Score: <span id="score">0</span></div>
+            <div class="stat-box">⏳ Time: <span id="time-text">30</span>s</div>
+        </div>
+        <div class="timer-bar-container">
+            <div id="timer-bar" class="timer-bar"></div>
+        </div>
+        <div id="flashcard" class="flashcard">? × ?</div>
+        <div class="input-area">
+            <input type="number" id="answer-input" placeholder="?" min="0" autocomplete="off">
+            <button id="check-btn" onclick="checkAnswer()">Check!</button>
+        </div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <script>
+        let score = 0, num1 = 0, num2 = 0, correctAnswer = 0, attempts = 0, timeLeft = 30, timerInterval;
+        const input = document.getElementById('answer-input');
+
+        function generateQuestion() {
+            num1 = Math.floor(Math.random() * 12) + 1;
+            num2 = Math.floor(Math.random() * 12) + 1;
+            correctAnswer = num1 * num2;
+            attempts = 0;
+            timeLeft = 30;
+            document.getElementById('flashcard').innerText = `${num1} × ${num2}`;
+            input.value = '';
+            input.disabled = false;
+            document.getElementById('check-btn').disabled = false;
+            input.focus();
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimerBar();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time-text').innerText = timeLeft;
+                updateTimerBar();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function updateTimerBar() {
+            const percentage = (timeLeft / 30) * 100;
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = percentage + '%';
+            bar.style.background = percentage > 50 ? '#4ADE80' : percentage > 20 ? '#FBBF24' : '#EF4444';
+        }
+
+        function checkAnswer() {
+            let userAnswer = parseInt(input.value);
+            let feedback = document.getElementById('feedback');
+            if (isNaN(userAnswer)) return;
+
+            if (userAnswer === correctAnswer) {
+                clearInterval(timerInterval);
+                let points = timeLeft > 15 ? 20 : 10;
+                score += points;
+                document.getElementById('score').innerText = score;
+                feedback.className = "feedback correct-pop";
+                feedback.innerHTML = `🎉 Correct! +${points} Points! 🌟`;
+                input.disabled = true;
+                setTimeout(generateQuestion, 2000);
+            } else {
+                attempts++;
+                if (attempts < 3) {
+                    feedback.className = "feedback wrong-pop";
+                    feedback.innerHTML = `❌ Try again! (Attempt ${attempts}/3) 🤔`;
+                    input.value = '';
+                    input.focus();
+                } else {
+                    clearInterval(timerInterval);
+                    feedback.className = "feedback wrong-pop";
+                    feedback.innerHTML = `💡 Out of tries! ${num1} × ${num2} = ${correctAnswer}`;
+                    input.disabled = true;
+                    setTimeout(generateQuestion, 3500);
+                }
+            }
+        }
+
+        function handleTimeout() {
+            let feedback = document.getElementById('feedback');
+            feedback.className = "feedback wrong-pop";
+            feedback.innerHTML = `⏰ Time's up! ${num1} × ${num2} = ${correctAnswer}`;
+            input.disabled = true;
+            setTimeout(generateQuestion, 3500);
+        }
+
+        input.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") checkAnswer();
+        });
+
+        generateQuestion();
+    </script>
+</body>
+</html>"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(game_code)
