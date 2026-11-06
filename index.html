@@ -310,67 +310,80 @@
             function updateTimerVisuals() {
                 const ratio = (countdownSeconds / 30) * 100;
                 barFill.style.width = ratio + "%";
+                
                 if (ratio > 50) {
-barFill.style.background = "linear-gradient(90deg, #4ade80, #22c55e)";
-} else if (ratio > 20) {
-barFill.style.background = "linear-gradient(90deg, #facc15, #eab308)";
-} else {
-barFill.style.background = "linear-gradient(90deg, #f87171, #ef4444)";
-}
-}
-function processUserValidation() {
-const parsedValue = parseInt(inputField.value, 10);
-if (isNaN(parsedValue)) return;
-inputField.disabled = true;
-commitButton.disabled = true;
-if (parsedValue === targetProduct) {
-clearInterval(clockTicker);
-let gainedPoints = 10;
-if (countdownSeconds >= 20) {
-gainedPoints = 25;
-} else if (countdownSeconds >= 10) {
-gainedPoints = 18;
-}
-activeScore += gainedPoints;
-runningStreak++;
-if (runningStreak > recordStreak) recordStreak = runningStreak;
-document.getElementById('display-score').innerText = activeScore;
-document.getElementById('display-streak').innerText = runningStreak;
-document.getElementById('display-best').innerText = recordStreak;
-alertDisplay.className = "alert-box state-correct";
-alertDisplay.innerHTML = "🎉 Excellent! +" + gainedPoints + " Points! ✨";
-setTimeout(startNewRound, 2000);
-} else {
-badAttempts++;
-if (badAttempts < 3) {
-alertDisplay.className = "alert-box state-incorrect";
-alertDisplay.innerHTML = "❌ Not quite! Try again (Try " + badAttempts + "/3) 🤔";
-inputField.disabled = false;
-commitButton.disabled = false;
-inputField.value = "";
-inputField.focus();
-} else {
-clearInterval(clockTicker);
-runningStreak = 0;
-document.getElementById('display-streak').innerText = runningStreak;
-alertDisplay.className = "alert-box state-incorrect";
-alertDisplay.innerHTML = "💡 Let's learn: " + factorA + " × " + factorB + " = " + targetProduct;
-setTimeout(startNewRound, 3500);
-}
-}
-}
-function handleTimeOutFailure() {
-inputField.disabled = true;
-commitButton.disabled = true;
-runningStreak = 0;
-document.getElementById('display-streak').innerText = runningStreak;
-alertDisplay.className = "alert-box state-incorrect";
-alertDisplay.innerHTML = "⏰ Time's up! " + factorA + " × " + factorB + " = " + targetProduct;
-setTimeout(startNewRound, 3500);
-}
-commitButton.addEventListener('click', processUserValidation);
-inputField.addEventListener('keyup', function(e) {
-if (e.key === "Enter") processUserValidation();
-});
-startNewRound();
+                barFill.style.background = "linear-gradient(90deg, #4ade80, #22c55e)";
+                    
+                } else if (ratio > 20) {
+                barFill.style.background = "linear-gradient(90deg, #facc15, #eab308)";
+                    
+                } else {
+                 barFill.style.background = "linear-gradient(90deg, #f87171, #ef4444)";
+                }
+            }
+            function processUserValidation() {
+            const parsedValue = parseInt(inputField.value, 10);
+                
+                if (isNaN(parsedValue)) return;
+                inputField.disabled = true;
+                commitButton.disabled = true;
+                
+                if (parsedValue === targetProduct) {
+                clearInterval(clockTicker);
+                let gainedPoints = 10;
+                    
+                if (countdownSeconds >= 20) {
+                gainedPoints = 25;
+                    
+                } else if (countdownSeconds >= 10) {
+                gainedPoints = 18;
+            }
+            activeScore += gainedPoints;
+            runningStreak++;
+                    
+                if (runningStreak > recordStreak) recordStreak = runningStreak;
+                document.getElementById('display-score').innerText = activeScore;
+                document.getElementById('display-streak').innerText = runningStreak;
+                document.getElementById('display-best').innerText = recordStreak;
+                alertDisplay.className = "alert-box state-correct";
+                alertDisplay.innerHTML = "🎉 Excellent! +" + gainedPoints + " Points! ✨";
+                setTimeout(startNewRound, 2000);
+                    
+            } else {
+            badAttempts++;
+                    
+                if (badAttempts < 3) {
+                alertDisplay.className = "alert-box state-incorrect";
+                alertDisplay.innerHTML = "❌ Not quite! Try again (Try " + badAttempts + "/3) 🤔";
+                inputField.disabled = false;
+                commitButton.disabled = false;
+                inputField.value = "";
+                inputField.focus();
+                
+                } else {
+                clearInterval(clockTicker);
+                runningStreak = 0;
+                document.getElementById('display-streak').innerText = runningStreak;
+                alertDisplay.className = "alert-box state-incorrect";
+                alertDisplay.innerHTML = "💡 Let's learn: " + factorA + " × " + factorB + " = " + targetProduct;
+                setTimeout(startNewRound, 3500);
+                }
+            }
+            }
+            
+            function handleTimeOutFailure() {
+            inputField.disabled = true;
+            commitButton.disabled = true;
+            runningStreak = 0;
+            document.getElementById('display-streak').innerText = runningStreak;
+            alertDisplay.className = "alert-box state-incorrect";
+            alertDisplay.innerHTML = "⏰ Time's up! " + factorA + " × " + factorB + " = " + targetProduct;
+            setTimeout(startNewRound, 3500);
+            }
+            commitButton.addEventListener('click', processUserValidation);
+            inputField.addEventListener('keyup', function(e) {
+                
+                    if (e.key === "Enter") processUserValidation();
+            });
+    startNewRound();
 })();
